@@ -1,0 +1,118 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm cream surface system, shared with the marketing site. */
+    --background: 44 30% 94%; /* #F4F1EA cream page */
+    --foreground: 0 0% 14%; /* #242424 */
+
+    --card: 45 48% 98%; /* warm near-white card */
+    --card-foreground: 0 0% 14%;
+
+    --primary: 0 0% 14%; /* #242424 black CTAs */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 42 22% 90%;
+    --secondary-foreground: 30 8% 18%;
+
+    --muted: 42 22% 90%;
+    --muted-foreground: 38 7% 40%; /* #6B665F */
+
+    --accent: 42 24% 89%;
+    --accent-foreground: 30 8% 18%;
+
+    --destructive: 0 72% 45%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 147 56% 44%; /* #31B36B */
+    --success-foreground: 0 0% 100%;
+
+    --border: 40 16% 85%;
+    --input: 40 16% 85%;
+    --ring: 30 10% 20%;
+
+    --radius: 0.8rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "cv11", "ss01";
+    text-rendering: optimizeLegibility;
+  }
+}
+
+/* Solana wallet adapter modal: keep it consistent with the app's black/white theme. */
+.wallet-adapter-button {
+  font-family: inherit !important;
+}
+
+/* Subtle grid backdrop used behind the hero. */
+.bg-grid {
+  background-image:
+    linear-gradient(to right, hsl(0 0% 0% / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, hsl(0 0% 0% / 0.04) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+.bg-radial-fade {
+  -webkit-mask-image: radial-gradient(ellipse 60% 60% at 50% 0%, #000 40%, transparent 100%);
+  mask-image: radial-gradient(ellipse 60% 60% at 50% 0%, #000 40%, transparent 100%);
+}
+
+::selection {
+  background: hsl(0 0% 4%);
+  color: #fff;
+}
+
+/* ----------------------------------------------------------------------------
+   Landing page (marketing) helpers — scoped to the redesigned "/" page.
+   These do not affect /app, which keeps the white app theme.
+---------------------------------------------------------------------------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Warm cream base with a very faint grain so large flat areas don't feel sterile. */
+.bg-cream-noise {
+  background-color: #ede9e0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+.card-grain {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+}
+
+/* Shared hover lift for landing cards. */
+.lift {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+.lift:hover {
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .lift:hover {
+    transform: none;
+  }
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
