@@ -407,7 +407,7 @@ function StepIdentity(props: {
         <div className="space-y-1.5">
           <Label>Treasury name</Label>
           <Input
-            placeholder="e.g. Bylaw Foundation"
+            placeholder="e.g. Acme DAO Treasury"
             value={props.name}
             onChange={(e) => props.setName(e.target.value)}
           />
