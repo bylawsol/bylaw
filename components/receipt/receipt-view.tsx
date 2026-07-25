@@ -77,11 +77,7 @@ export function ReceiptView({
       <div className="p-6 sm:p-8">
         <div className="flex items-center justify-between gap-3">
           <Logo />
-          {payout.demo ? (
-            <Badge variant="warning">Demo receipt</Badge>
-          ) : (
-            <Badge variant="muted">Payout receipt</Badge>
-          )}
+          <Badge variant="muted">Payout receipt</Badge>
         </div>
 
         <p className="mt-6 text-sm text-[#66625C]">
@@ -196,21 +192,15 @@ export function ReceiptView({
             <p className="text-xs font-semibold uppercase tracking-wider text-[#8a857d]">
               Transaction
             </p>
-            {payout.demo ? (
-              <p className="mt-1 text-sm text-[#66625C]">
-                Demo execution — not a real transaction, no explorer link.
-              </p>
-            ) : (
-              <a
-                href={explorerTxUrl(payout.txSignature)}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-[#5b4bd6] hover:underline"
-              >
-                <ExternalLink className="size-3.5" /> View on Solana Explorer (
-                {NETWORK_LABEL_LOWER})
-              </a>
-            )}
+            <a
+              href={explorerTxUrl(payout.txSignature)}
+              target="_blank"
+              rel="noreferrer"
+              className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-[#5b4bd6] hover:underline"
+            >
+              <ExternalLink className="size-3.5" /> View on Solana Explorer (
+              {NETWORK_LABEL_LOWER})
+            </a>
           </div>
         )}
 

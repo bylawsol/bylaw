@@ -85,8 +85,8 @@ export default function ReceiptPage() {
               Receipt not found
             </h1>
             <p className="mx-auto mt-2 max-w-sm text-sm text-[#66625C]">
-              This receipt isn&apos;t available in this browser. Receipts for
-              local-demo treasuries only exist on the device that created them.
+              This receipt isn&apos;t available in this browser. In Local mode,
+              treasuries only exist on the device that created them.
             </p>
             <Link href="/app" className="mt-6 inline-block">
               <Button className="rounded-full">

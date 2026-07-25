@@ -21,10 +21,7 @@ import {
   storageMode,
   StorageMode,
   clearAllLocal,
-  deleteTreasury,
 } from "@/lib/storage";
-import { buildSeedTreasury } from "@/lib/seed";
-import { buildDemoTreasury } from "@/lib/demo";
 import { evaluatePolicy, PolicyResult } from "@/lib/policy";
 import { uid } from "@/lib/utils";
 import { NETWORK_LABEL_LOWER } from "@/lib/network";
@@ -73,17 +70,8 @@ interface TreasuryContextValue {
   updateTreasuryMeta: (patch: { name?: string; description?: string }) => Promise<void>;
 
   createTreasury: (input: CreateTreasuryInput) => Promise<Treasury>;
-  reseedDemo: () => Promise<void>;
-  clearDemoData: () => Promise<void>;
+  clearAllData: () => Promise<void>;
   importTreasury: (t: Treasury) => Promise<void>;
-
-  // Demo mode (no wallet needed; never touches a real chain).
-  isDemo: boolean;
-  enterDemoMode: () => Promise<void>;
-  resetDemo: () => Promise<void>;
-  exitDemoMode: () => Promise<void>;
-  addDemoApproval: (payoutId: string) => Promise<void>;
-  demoExecute: (payoutId: string) => Promise<void>;
 }
 
 const TreasuryContext = React.createContext<TreasuryContextValue | null>(null);
@@ -197,7 +185,6 @@ export function TreasuryProvider({ children }: { children: React.ReactNode }) {
       loading,
       mode,
       wallet,
-      isDemo: treasury?.isDemo === true,
       refresh: load,
 
       selectTreasury: async (id) => {
@@ -352,11 +339,7 @@ export function TreasuryProvider({ children }: { children: React.ReactNode }) {
 
       rejectPayout: async (payoutId, reason) => {
         const t = requireTreasury();
-        const rejActor =
-          wallet ||
-          (t.isDemo
-            ? t.members.find((m) => m.role === "Admin")?.walletAddress ?? "demo"
-            : "unknown");
+        const rejActor = wallet || "unknown";
         const next: Treasury = {
           ...t,
           payouts: t.payouts.map((p) =>
@@ -489,14 +472,7 @@ export function TreasuryProvider({ children }: { children: React.ReactNode }) {
         return created;
       },
 
-      reseedDemo: async () => {
-        const seed = buildSeedTreasury(wallet);
-        await saveTreasury(seed);
-        await setActiveTreasuryId(seed.id);
-        await load();
-      },
-
-      clearDemoData: async () => {
+      clearAllData: async () => {
         await clearAllLocal();
         setTreasury(null);
         setTreasuries([]);
@@ -507,105 +483,6 @@ export function TreasuryProvider({ children }: { children: React.ReactNode }) {
         await saveTreasury(imported);
         await setActiveTreasuryId(imported.id);
         await load();
-      },
-
-      enterDemoMode: async () => {
-        const existing = (await getTreasuries()).find((t) => t.isDemo);
-        if (existing) {
-          await setActiveTreasuryId(existing.id);
-        } else {
-          const demo = buildDemoTreasury();
-          await saveTreasury(demo);
-          await setActiveTreasuryId(demo.id);
-        }
-        await load();
-      },
-
-      resetDemo: async () => {
-        const existing = (await getTreasuries()).filter((t) => t.isDemo);
-        for (const d of existing) await deleteTreasury(d.id);
-        const demo = buildDemoTreasury();
-        await saveTreasury(demo);
-        await setActiveTreasuryId(demo.id);
-        await load();
-      },
-
-      exitDemoMode: async () => {
-        if (treasury?.isDemo) await deleteTreasury(treasury.id);
-        const remaining = (await getTreasuries()).filter((t) => !t.isDemo);
-        await setActiveTreasuryId(remaining[0]?.id ?? null);
-        await load();
-      },
-
-      addDemoApproval: async (payoutId) => {
-        const t = requireTreasury();
-        const p = t.payouts.find((x) => x.id === payoutId);
-        if (!p) return;
-        const eligible = t.members.filter(
-          (m) => m.role === "Admin" || m.role === "Approver",
-        );
-        const signed = new Set(
-          p.approvals.map((a) => a.signerAddress.toLowerCase()),
-        );
-        const nextSigner = eligible.find(
-          (m) => !signed.has(m.walletAddress.toLowerCase()),
-        );
-        if (!nextSigner) return;
-        const approval = {
-          signerAddress: nextSigner.walletAddress,
-          signature: `DEMO-${uid()}`,
-          message: "Demo approval — no wallet signature performed.",
-          signedAt: new Date().toISOString(),
-        };
-        const next: Treasury = {
-          ...t,
-          payouts: t.payouts.map((x) =>
-            x.id === payoutId
-              ? { ...x, approvals: [...x.approvals, approval] }
-              : x,
-          ),
-          auditEvents: [
-            ...t.auditEvents,
-            makeEvent(
-              "payout_approved",
-              nextSigner.walletAddress,
-              `Payout approved (demo signature) by ${nextSigner.label}`,
-              { payoutId, signer: nextSigner.walletAddress, demo: true },
-            ),
-          ],
-        };
-        await persist(next);
-      },
-
-      demoExecute: async (payoutId) => {
-        const t = requireTreasury();
-        const p = t.payouts.find((x) => x.id === payoutId);
-        const actor =
-          t.members.find((m) => m.role === "Admin")?.walletAddress || "demo";
-        const next: Treasury = {
-          ...t,
-          payouts: t.payouts.map((x) =>
-            x.id === payoutId
-              ? {
-                  ...x,
-                  status: "Executed" as const,
-                  demo: true,
-                  txSignature: `DEMO-${uid()}${uid()}`,
-                  executedAt: new Date().toISOString(),
-                }
-              : x,
-          ),
-          auditEvents: [
-            ...t.auditEvents,
-            makeEvent(
-              "payout_executed",
-              actor,
-              `Payout executed: ${p?.amountSol ?? ""} SOL (demo — no real transaction)`,
-              { payoutId, demo: true },
-            ),
-          ],
-        };
-        await persist(next);
       },
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps

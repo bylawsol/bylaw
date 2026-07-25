@@ -1,15 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-  Database,
-  Download,
-  HardDrive,
-  RefreshCw,
-  Save,
-  Trash2,
-  Upload,
-} from "lucide-react";
+import { Database, Download, HardDrive, Save, Trash2, Upload } from "lucide-react";
 import { useTreasury } from "@/components/treasury-provider";
 import { useToast } from "@/components/ui/toast";
 import { PageHeader, PageSkeleton, Spinner } from "@/components/app/ui-bits";
@@ -30,22 +22,14 @@ import { Treasury } from "@/lib/types";
 import { NETWORK_LABEL_LOWER } from "@/lib/network";
 
 export default function SettingsPage() {
-  const {
-    treasury,
-    loading,
-    mode,
-    updateTreasuryMeta,
-    reseedDemo,
-    clearDemoData,
-    importTreasury,
-  } = useTreasury();
+  const { treasury, loading, mode, updateTreasuryMeta, clearAllData, importTreasury } =
+    useTreasury();
   const toast = useToast();
 
   const [name, setName] = React.useState("");
   const [description, setDescription] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [clearOpen, setClearOpen] = React.useState(false);
-  const [reseedOpen, setReseedOpen] = React.useState(false);
   const fileRef = React.useRef<HTMLInputElement>(null);
 
   React.useEffect(() => {
@@ -109,7 +93,7 @@ export default function SettingsPage() {
     <div>
       <PageHeader
         title="Settings"
-        description="Treasury details, storage mode, and demo data."
+        description="Treasury details, storage mode, and local data."
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -168,16 +152,13 @@ export default function SettingsPage() {
             <CardHeader>
               <CardTitle className="text-destructive">Danger zone</CardTitle>
               <CardDescription>
-                Demo data lives in your browser (localStorage). These actions
-                only affect local demo data.
+                In Local mode, treasury data lives in this browser. Clearing it
+                cannot be undone.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-wrap gap-2">
-              <Button variant="outline" onClick={() => setReseedOpen(true)}>
-                <RefreshCw className="size-4" /> Reseed demo treasury
-              </Button>
               <Button variant="destructive" onClick={() => setClearOpen(true)}>
-                <Trash2 className="size-4" /> Clear local demo data
+                <Trash2 className="size-4" /> Clear local data
               </Button>
             </CardContent>
           </Card>
@@ -190,7 +171,7 @@ export default function SettingsPage() {
               <CardTitle>Storage mode</CardTitle>
               <CardDescription>
                 Bylaw uses Supabase when its env vars are set, otherwise local
-                demo storage.
+                browser storage.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -202,7 +183,7 @@ export default function SettingsPage() {
                 )}
                 <div>
                   <p className="text-sm font-medium">
-                    {mode === "supabase" ? "Supabase" : "Local Demo"}
+                    {mode === "supabase" ? "Supabase" : "Local"}
                   </p>
                   <p className="text-xs text-muted-foreground">
                     {mode === "supabase"
@@ -237,7 +218,7 @@ export default function SettingsPage() {
       <Modal
         open={clearOpen}
         onClose={() => setClearOpen(false)}
-        title="Clear local demo data?"
+        title="Clear local data?"
         description={`This permanently removes all treasuries stored in this browser. Executed ${NETWORK_LABEL_LOWER} transactions on-chain are not affected.`}
         footer={
           <>
@@ -247,35 +228,12 @@ export default function SettingsPage() {
             <Button
               variant="destructive"
               onClick={async () => {
-                await clearDemoData();
+                await clearAllData();
                 setClearOpen(false);
                 toast.success("Local data cleared", "Redirecting to setup…");
               }}
             >
               Clear everything
-            </Button>
-          </>
-        }
-      />
-
-      <Modal
-        open={reseedOpen}
-        onClose={() => setReseedOpen(false)}
-        title="Reseed demo treasury?"
-        description="This creates a fresh Bylaw Foundation sample treasury with your connected wallet as Admin. Existing treasuries remain."
-        footer={
-          <>
-            <Button variant="outline" onClick={() => setReseedOpen(false)}>
-              Cancel
-            </Button>
-            <Button
-              onClick={async () => {
-                await reseedDemo();
-                setReseedOpen(false);
-                toast.success("Demo treasury reseeded");
-              }}
-            >
-              Reseed
             </Button>
           </>
         }

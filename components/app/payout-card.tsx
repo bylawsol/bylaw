@@ -43,16 +43,8 @@ export function PayoutCard({
   treasury: Treasury;
 }) {
   const walletCtx = useWallet();
-  const {
-    wallet,
-    addApproval,
-    rejectPayout,
-    markExecuted,
-    addDemoApproval,
-    demoExecute,
-  } = useTreasury();
+  const { wallet, addApproval, rejectPayout, markExecuted } = useTreasury();
   const toast = useToast();
-  const demo = treasury.isDemo === true;
 
   const [expanded, setExpanded] = React.useState(false);
   const [approving, setApproving] = React.useState(false);
@@ -85,20 +77,6 @@ export function PayoutCard({
   const isOpen = payout.status === "Pending Approval";
 
   const onApprove = async () => {
-    if (demo) {
-      if (approvals >= threshold) {
-        toast.info("Threshold reached", "This payout already has enough approvals.");
-        return;
-      }
-      setApproving(true);
-      try {
-        await addDemoApproval(payout.id);
-        toast.success("Demo approval added", `${Math.min(approvals + 1, threshold)} of ${threshold} collected`);
-      } finally {
-        setApproving(false);
-      }
-      return;
-    }
     if (!wallet) {
       toast.error("Connect a wallet to approve");
       return;
@@ -141,27 +119,7 @@ export function PayoutCard({
     }
   };
 
-  const demoExecEligible =
-    demo &&
-    payout.policyPassed &&
-    payout.status === "Pending Approval" &&
-    approvals >= threshold;
-
   const onExecute = async () => {
-    if (demo) {
-      if (!demoExecEligible) {
-        toast.error("Cannot execute", "Collect enough approvals first.");
-        return;
-      }
-      setExecuting(true);
-      try {
-        await demoExecute(payout.id);
-        toast.success("Demo payout executed", "Recorded with a demo tx — no real transfer.");
-      } finally {
-        setExecuting(false);
-      }
-      return;
-    }
     if (!exec.canExecute) {
       toast.error("Cannot execute", exec.reasons[0]);
       return;
@@ -180,7 +138,7 @@ export function PayoutCard({
   };
 
   const onReject = async () => {
-    if (!demo && !approverAllowed) {
+    if (!approverAllowed) {
       toast.error("Not authorized", "Only Approvers or Admins can reject.");
       return;
     }
@@ -209,11 +167,6 @@ export function PayoutCard({
               </span>
               <Badge variant="outline">{payout.category}</Badge>
               <StatusPill status={payout.status} />
-              {payout.demo && (
-                <Badge variant="warning" className="gap-1">
-                  Demo only
-                </Badge>
-              )}
             </div>
             <div className="mt-2 flex items-center gap-1.5 text-sm text-muted-foreground">
               <span>To</span>
@@ -269,22 +222,17 @@ export function PayoutCard({
               <ShieldAlert className="size-3" /> Policy blocked
             </Badge>
           )}
-          {payout.txSignature &&
-            (payout.demo ? (
-              <Badge variant="muted" title="Demo execution — not a real transaction">
-                <ExternalLink className="size-3" /> Demo tx (no explorer)
+          {payout.txSignature && (
+            <a
+              href={explorerTxUrl(payout.txSignature)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Badge variant="outline" className="hover:bg-accent">
+                <ExternalLink className="size-3" /> View on Explorer
               </Badge>
-            ) : (
-              <a
-                href={explorerTxUrl(payout.txSignature)}
-                target="_blank"
-                rel="noreferrer"
-              >
-                <Badge variant="outline" className="hover:bg-accent">
-                  <ExternalLink className="size-3" /> View on Explorer
-                </Badge>
-              </a>
-            ))}
+            </a>
+          )}
           <div className="ml-auto flex items-center gap-3">
             <Link
               href={`/app/payouts/${payout.id}`}
@@ -358,59 +306,45 @@ export function PayoutCard({
             <Button
               size="sm"
               onClick={onApprove}
-              disabled={
-                demo
-                  ? approving || !isOpen || approvals >= threshold
-                  : approving || !isOpen || alreadyApproved || !approverAllowed
-              }
+              disabled={approving || !isOpen || alreadyApproved || !approverAllowed}
               title={
-                !demo && !approverAllowed
+                !approverAllowed
                   ? "Only Approvers or Admins can approve"
-                  : !demo && alreadyApproved
+                  : alreadyApproved
                     ? "You already approved"
                     : undefined
               }
             >
               {approving ? <Spinner /> : <PenLine className="size-4" />}
-              {!demo && alreadyApproved ? "Approved" : "Approve"}
+              {alreadyApproved ? "Approved" : "Approve"}
             </Button>
             <Button
               size="sm"
               variant="outline"
               onClick={() => setRejectOpen(true)}
-              disabled={demo ? !isOpen : !approverAllowed || !isOpen}
+              disabled={!approverAllowed || !isOpen}
             >
               <Ban className="size-4" /> Reject
             </Button>
             <Button
               size="sm"
-              variant={
-                (demo ? demoExecEligible : exec.canExecute) ? "default" : "outline"
-              }
+              variant={exec.canExecute ? "default" : "outline"}
               onClick={onExecute}
-              disabled={demo ? !demoExecEligible || executing : !exec.canExecute || executing}
-              title={!demo && !exec.canExecute ? exec.reasons.join(" · ") : undefined}
+              disabled={!exec.canExecute || executing}
+              title={!exec.canExecute ? exec.reasons.join(" · ") : undefined}
             >
               {executing ? <Spinner /> : <Play className="size-4" />}
-              {demo ? "Execute (demo)" : "Execute"}
+              Execute
             </Button>
           </div>
         )}
         {payout.status === "Pending Approval" &&
-          (demo ? (
-            !demoExecEligible && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                Demo: collect {threshold} approvals, then execute (no real transfer).
-              </p>
-            )
-          ) : (
-            !exec.canExecute &&
-            exec.reasons.length > 0 && (
-              <p className="mt-2 text-xs text-muted-foreground">
-                To execute: {exec.reasons.join(" · ")}
-              </p>
-            )
-          ))}
+          !exec.canExecute &&
+          exec.reasons.length > 0 && (
+            <p className="mt-2 text-xs text-muted-foreground">
+              To execute: {exec.reasons.join(" · ")}
+            </p>
+          )}
       </CardContent>
 
       <Modal

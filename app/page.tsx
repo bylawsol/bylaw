@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, CheckCircle2, Rocket, Sparkles } from "lucide-react";
+import { ArrowRight, Rocket } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Logo } from "@/components/logo";
 import { Button } from "@/components/ui/button";
@@ -69,23 +69,16 @@ export default function LandingPage() {
                   Open App <ArrowRight className="size-4" />
                 </Button>
               </Link>
-              <Link href="/app?demo=true">
+              <a href="#workflow">
                 <Button
                   size="lg"
                   variant="outline"
                   className="rounded-full border-black/15 bg-transparent hover:bg-black/5"
                 >
-                  <Sparkles className="size-4" /> Try Demo Mode
+                  See workflow <ArrowRight className="size-4" />
                 </Button>
-              </Link>
+              </a>
             </div>
-
-            <a
-              href="#workflow"
-              className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-[#57534c] underline underline-offset-4 transition-colors hover:text-[#242424]"
-            >
-              See workflow <ArrowRight className="size-3.5" />
-            </a>
 
             <div className="mt-8 flex flex-wrap gap-2">
               {TRUST.map((t) => (

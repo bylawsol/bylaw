@@ -46,20 +46,6 @@ import { cn, isValidSolanaAddress, shortAddress } from "@/lib/utils";
 
 const STEPS = ["Identity", "Members", "Rules", "Review"] as const;
 
-// Valid devnet addresses used only when the user opts into demo members.
-const DEMO_MEMBERS: NewMemberInput[] = [
-  {
-    walletAddress: "36Y9zUDMx2JuK9DmZn9ibKh6ZCcMEtsGpXcVXW7Dbbuq",
-    label: "Demo approver 1",
-    role: "Approver",
-  },
-  {
-    walletAddress: "68SyADuFWerx5JKnGSk6HaeZh5UxaLhkv3zaVNaxC4nD",
-    label: "Demo approver 2",
-    role: "Approver",
-  },
-];
-
 export default function SetupWizard() {
   const router = useRouter();
   const toast = useToast();
@@ -147,17 +133,6 @@ export default function SetupWizard() {
     setMAddr("");
     setMLabel("");
     setMRole("Approver");
-  };
-
-  const addDemoMembers = () => {
-    setMembers((prev) => {
-      const existing = new Set(prev.map((m) => m.walletAddress.toLowerCase()));
-      const add = DEMO_MEMBERS.filter(
-        (d) => !existing.has(d.walletAddress.toLowerCase()),
-      );
-      return [...prev, ...add];
-    });
-    toast.success("Demo members added", "You can remove them anytime.");
   };
 
   const validateStep = (s: number): boolean => {
@@ -249,16 +224,6 @@ export default function SetupWizard() {
           <p className="mx-auto mt-2 max-w-md text-sm text-[#66625C]">
             Four quick steps: identity, members, spending rules, and review.
           </p>
-          <p className="mt-3 text-sm text-[#66625C]">
-            Just exploring?{" "}
-            <Link
-              href="/app?demo=true"
-              className="font-medium text-[#5b4bd6] underline underline-offset-2 hover:text-[#242424]"
-            >
-              Try demo mode
-            </Link>{" "}
-            — no wallet needed.
-          </p>
         </div>
 
         <StepIndicator step={step} />
@@ -288,7 +253,6 @@ export default function SetupWizard() {
               mRole={mRole}
               setMRole={setMRole}
               addMember={addMember}
-              addDemoMembers={addDemoMembers}
             />
           )}
 
@@ -357,7 +321,7 @@ export default function SetupWizard() {
         </div>
 
         <p className="mt-6 text-center text-xs text-[#8a857d]">
-          Saved to {mode === "supabase" ? "Supabase" : "your browser (local demo)"}.
+          Saved to {mode === "supabase" ? "Supabase" : "your browser (local)"}.
           You can edit everything later.
         </p>
       </main>
@@ -506,7 +470,6 @@ function StepMembers(props: {
   mRole: MemberRole;
   setMRole: (v: MemberRole) => void;
   addMember: () => void;
-  addDemoMembers: () => void;
 }) {
   return (
     <div>
@@ -581,18 +544,11 @@ function StepMembers(props: {
       {/* added members */}
       <div className="mt-5">
         {props.members.length === 0 ? (
-          <div className="flex flex-col items-center justify-between gap-3 rounded-xl border border-dashed border-black/15 bg-white/40 p-4 text-center sm:flex-row sm:text-left">
+          <div className="rounded-xl border border-dashed border-black/15 bg-white/40 p-4 text-center">
             <p className="text-sm text-[#66625C]">
-              No extra members yet. You can skip this and add demo members.
+              No extra members yet. Add approver and viewer wallets above, or add
+              them later from the Members page.
             </p>
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={props.addDemoMembers}
-              className="shrink-0"
-            >
-              <Sparkles className="size-4" /> Add demo members
-            </Button>
           </div>
         ) : (
           <div className="divide-y divide-border rounded-xl border border-black/10">

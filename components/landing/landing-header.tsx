@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { ArrowUpRight, LayoutGrid, Menu, Sparkles, X } from "lucide-react";
+import { ArrowUpRight, LayoutGrid, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { NETWORK_LABEL } from "@/lib/network";
 import { cn } from "@/lib/utils";
@@ -95,12 +95,6 @@ export function LandingHeader() {
             </span>
           </span>
 
-          <Link href="/app?demo=true" className="hidden sm:block">
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-4 py-2.5 text-sm font-medium text-[#242424] transition-colors hover:bg-white">
-              <Sparkles className="size-4 text-[#5b4bd6]" /> Try Demo
-            </span>
-          </Link>
-
           <Link href="/app">
             <Button className="group rounded-full bg-[#242424] px-4 font-semibold shadow-[0_10px_26px_-12px_rgba(184,179,255,0.8)] hover:bg-black sm:px-5">
               Open App
@@ -136,22 +130,13 @@ export function LandingHeader() {
                   {n.label}
                 </a>
               ))}
-              <div className="mt-1 grid grid-cols-2 gap-2">
-                <Link
-                  href="/app?demo=true"
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl border border-black/10 px-4 py-3 text-center text-sm font-medium text-[#242424]"
-                >
-                  Try Demo
-                </Link>
-                <Link
-                  href="/app"
-                  onClick={() => setOpen(false)}
-                  className="rounded-xl bg-[#242424] px-4 py-3 text-center text-sm font-semibold text-white"
-                >
-                  Open App
-                </Link>
-              </div>
+              <Link
+                href="/app"
+                onClick={() => setOpen(false)}
+                className="mt-1 rounded-xl bg-[#242424] px-4 py-3 text-center text-sm font-semibold text-white"
+              >
+                Open App
+              </Link>
             </nav>
           </div>
         </div>

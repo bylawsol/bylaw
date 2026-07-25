@@ -1,6 +1,6 @@
 // Storage abstraction. The UI never cares which backend is active.
 // - If Supabase env vars are present, use Supabase (normalized tables).
-// - Otherwise, fall back to localStorage ("Local Demo" mode).
+// - Otherwise, fall back to localStorage ("Local" mode).
 
 import { getSupabase, supabaseConfigured } from "./supabaseClient";
 import {

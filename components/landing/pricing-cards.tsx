@@ -23,7 +23,7 @@ const PLANS: Plan[] = [
     priceSuffix: "/forever",
     audience: "Teams testing wallet-signed payout workflows",
     includes: [
-      "Unlimited demo treasuries",
+      "Unlimited treasuries",
       "Wallet-signed approvals",
       `${NETWORK_LABEL} SOL payouts`,
       "Audit export",

@@ -7,13 +7,10 @@ import {
   FlaskConical,
   Gavel,
   LayoutDashboard,
-  LogOut,
   Menu,
-  RotateCcw,
   ScrollText,
   Send,
   Settings,
-  Sparkles,
   Users,
   X,
 } from "lucide-react";
@@ -23,7 +20,6 @@ import { WalletButton } from "@/components/app/wallet-button";
 import { Kbd } from "@/components/app/kbd";
 import { useTreasury } from "@/components/treasury-provider";
 import { useShortcuts } from "@/components/app/shortcuts-provider";
-import { useToast } from "@/components/ui/toast";
 import { SHORTCUTS } from "@/lib/shortcuts";
 import { NETWORK_LABEL } from "@/lib/network";
 import { cn, shortAddress } from "@/lib/utils";
@@ -45,44 +41,18 @@ const NAV = [
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const toast = useToast();
   const { openPalette } = useShortcuts();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const { mode, treasury, loading, isDemo, enterDemoMode, resetDemo, exitDemoMode } =
-    useTreasury();
+  const { mode, treasury, loading } = useTreasury();
 
   React.useEffect(() => {
     setMobileOpen(false);
   }, [pathname]);
 
-  // ?demo=true enters demo mode (from landing, empty state, or setup).
-  React.useEffect(() => {
-    if (loading || typeof window === "undefined") return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get("demo") === "true" && !isDemo) {
-      enterDemoMode().then(() => {
-        params.delete("demo");
-        const q = params.toString();
-        window.history.replaceState(
-          {},
-          "",
-          window.location.pathname + (q ? `?${q}` : ""),
-        );
-      });
-    }
-  }, [loading, isDemo, enterDemoMode]);
-
-  // First-time users (no treasury) are guided into the setup wizard —
-  // unless they're arriving to start demo mode.
+  // First-time users (no treasury) are guided into the setup wizard.
   const needsSetup = !loading && !treasury;
   React.useEffect(() => {
-    if (!needsSetup) return;
-    if (
-      typeof window !== "undefined" &&
-      new URLSearchParams(window.location.search).get("demo") === "true"
-    )
-      return;
-    router.replace("/app/setup");
+    if (needsSetup) router.replace("/app/setup");
   }, [needsSetup, router]);
 
   const nav = (
@@ -135,7 +105,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           mode === "supabase" ? "bg-success" : "bg-muted-foreground",
         )}
       />
-      {mode === "supabase" ? "Supabase" : "Local Demo"}
+      {mode === "supabase" ? "Supabase" : "Local"}
     </Badge>
   );
 
@@ -209,39 +179,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <WalletButton />
           </div>
         </header>
-        {isDemo && (
-          <div className="border-b border-black/[0.06] bg-gradient-to-r from-[#FFD6DC]/50 via-[#EAE6FF]/50 to-[#DCE6FF]/50">
-            <div className="flex flex-col items-start gap-2 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
-              <p className="flex items-center gap-2 text-sm text-[#57534c]">
-                <Sparkles className="size-4 text-[#5b4bd6]" />
-                <span>
-                  <span className="font-semibold text-[#242424]">Demo mode</span> —
-                  sample data, no wallet, and no real transactions.
-                </span>
-              </p>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={async () => {
-                    await resetDemo();
-                    toast.success("Demo reset", "Sample data restored.");
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-medium text-[#242424] transition-colors hover:bg-white"
-                >
-                  <RotateCcw className="size-3.5" /> Reset demo
-                </button>
-                <button
-                  onClick={async () => {
-                    await exitDemoMode();
-                    toast.info("Left demo mode");
-                  }}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#242424] px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-black"
-                >
-                  <LogOut className="size-3.5" /> Exit demo
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
         <main className="p-4 sm:p-6 lg:p-8">
           {needsSetup ? (
             <div className="flex min-h-[50vh] items-center justify-center">

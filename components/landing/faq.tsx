@@ -16,7 +16,7 @@ const FAQS = [
   },
   {
     q: "Do I need a wallet?",
-    a: `For approvals and execution, yes — Phantom on ${NETWORK_LABEL_LOWER}. You can explore the app and demo data without connecting, but signing and executing require a wallet.`,
+    a: `For approvals and execution, yes — Phantom on ${NETWORK_LABEL_LOWER}. You can set up a treasury and define rules without connecting, but signing and executing require a wallet.`,
   },
   {
     q: "Does this use AI agents?",

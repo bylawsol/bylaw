@@ -38,16 +38,11 @@ export default function DashboardPage() {
       <EmptyState
         icon={Wallet}
         title="No treasury yet"
-        description="Create your first treasury, or explore the full workflow in demo mode — no wallet needed."
+        description="Create your first treasury to start defining rules and submitting payouts."
         action={
-          <div className="flex flex-wrap justify-center gap-2">
-            <Link href="/app/setup">
-              <Button>Create treasury</Button>
-            </Link>
-            <Link href="/app?demo=true">
-              <Button variant="outline">Try demo mode</Button>
-            </Link>
-          </div>
+          <Link href="/app/setup">
+            <Button>Create treasury</Button>
+          </Link>
         }
       />
     );

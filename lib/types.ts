@@ -102,7 +102,6 @@ export interface Payout {
   txSignature?: string;
   createdAt: string;
   executedAt?: string;
-  demo?: boolean; // true for sample payouts executed in demo mode (never a real tx)
 }
 
 export interface AuditEvent {
@@ -119,7 +118,6 @@ export interface Treasury {
   name: string;
   description: string;
   treasuryType?: TreasuryType;
-  isDemo?: boolean;
   treasuryWalletAddress: string;
   createdByWallet: string;
   createdAt: string;
