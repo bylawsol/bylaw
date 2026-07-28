@@ -21,6 +21,10 @@ export const metadata: Metadata = {
   title: "Bylaw — Policy-bound payouts for onchain teams",
   description:
     `Create treasury rules, submit payout requests, collect wallet-signed approvals, and execute payments with a clean audit trail. Solana ${NETWORK_LABEL} MVP.`,
+  // Orynth site verification.
+  other: {
+    "ory-verify": "orynth-7d14d468b02a4f46a41f6be60819643a",
+  },
 };
 
 export default function RootLayout({
