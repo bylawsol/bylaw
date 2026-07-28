@@ -352,8 +352,14 @@ export default function LandingPage() {
               </Button>
             </Link>
           </div>
-          <div className="mt-8 border-t border-black/10 pt-6 text-center text-xs text-[#8a857d] sm:text-left">
-            Solana {NETWORK_LABEL_LOWER} MVP. Not a custodial multisig.
+          <div className="mt-8 flex flex-col gap-2 border-t border-black/10 pt-6 text-center text-xs text-[#8a857d] sm:flex-row sm:items-center sm:justify-between sm:text-left">
+            <span>Solana {NETWORK_LABEL_LOWER} MVP. Not a custodial multisig.</span>
+            <span
+              data-ory-verify="orynth-7d14d468b02a4f46a41f6be60819643a"
+              className="font-mono text-[10px] text-[#b8b3aa]"
+            >
+              ory-verify: orynth-7d14d468b02a4f46a41f6be60819643a
+            </span>
           </div>
         </Container>
       </footer>
